@@ -1,0 +1,22 @@
+import pandas as pd
+import numpy as np
+from pgmpy.models import BayesianModel
+from pgmpy.estimators import MaximumLikelihoodEstimator
+from pgmpy.inference import VariableElimination
+
+# Load dataset
+heartDisease = pd.read_csv('heart.csv')
+heartDisease = heartDisease.replace('?', np.nan)
+
+# Define Bayesian Network
+model = BayesianModel([('age', 'trestbps'), ('sex', 'trestbps'), ('trestbps', 'heartdisease'),
+                       ('heartdisease', 'restecg'), ('heartdisease', 'thalach')])
+
+# Learning CPDs using Maximum Likelihood Estimator
+model.fit(heartDisease, estimator=MaximumLikelihoodEstimator)
+
+# Inferencing with Bayesian Network
+HeartDisease_infer = VariableElimination(model)
+
+# Compute Probability of Heart Disease given Age
+print(HeartDisease_infer.query(variables=['heartdisease'], evidence={'age': 28}))
