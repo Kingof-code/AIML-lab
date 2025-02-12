@@ -1,0 +1,27 @@
+from queue import PriorityQueue
+
+def a_star(graph, start, goal):
+    pq = PriorityQueue()
+    pq.put((0, start))
+    visited = {start: 0}
+    
+    while not pq.empty():
+        cost, node = pq.get()
+        if node == goal:
+            return cost
+        
+        for neighbor, weight in graph[node]:
+            new_cost = cost + weight
+            if neighbor not in visited or new_cost < visited[neighbor]:
+                visited[neighbor] = new_cost
+                pq.put((new_cost, neighbor))
+
+graph = {
+    '0': [('1', 3), ('2', 6), ('3', 5)],
+    '1': [('4', 9), ('5', 8)],
+    '2': [('6', 12), ('7', 14)],
+    '3': [('8', 7)],
+    '8': [('9', 5), ('10', 6)],
+    '9': [('11', 1), ('12', 10), ('13', 2)]
+}
+print("Shortest Path Cost:", a_star(graph, '0', '9'))
