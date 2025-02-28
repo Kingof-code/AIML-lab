@@ -1,22 +1,47 @@
 import pandas as pd
 import numpy as np
-from pgmpy.models import BayesianModel
-from pgmpy.estimators import MaximumLikelihoodEstimator
-from pgmpy.inference import VariableElimination
+from sklearn.naive_bayes import GaussianNB
 
-# Load dataset
-heartDisease = pd.read_csv('heart.csv')
-heartDisease = heartDisease.replace('?', np.nan)
+# Create a synthetic dataset
+np.random.seed(42)
 
-# Define Bayesian Network
-model = BayesianModel([('age', 'trestbps'), ('sex', 'trestbps'), ('trestbps', 'heartdisease'),
-                       ('heartdisease', 'restecg'), ('heartdisease', 'thalach')])
+# Simulate some data
+n_samples = 1000
 
-# Learning CPDs using Maximum Likelihood Estimator
-model.fit(heartDisease, estimator=MaximumLikelihoodEstimator)
+# Define features: age, sex, trestbps, heartdisease, restecg, thalach
+age = np.random.randint(20, 80, size=n_samples)  # Age between 20 and 80
+sex = np.random.choice([0, 1], size=n_samples)   # Binary sex (0 = female, 1 = male)
+trestbps = np.random.randint(90, 180, size=n_samples)  # Resting blood pressure
+heartdisease = np.random.choice([0, 1, 2, 3, 4], size=n_samples)  # 5 levels of heart disease (0 - 4)
+restecg = np.random.choice([0, 1, 2], size=n_samples)  # Resting electrocardiographic results
+thalach = np.random.randint(60, 200, size=n_samples)  # Max heart rate achieved
 
-# Inferencing with Bayesian Network
-HeartDisease_infer = VariableElimination(model)
+# Create a DataFrame
+heartDisease = pd.DataFrame({
+    'age': age,
+    'sex': sex,
+    'trestbps': trestbps,
+    'heartdisease': heartdisease,
+    'restecg': restecg,
+    'thalach': thalach
+})
 
-# Compute Probability of Heart Disease given Age
-print(HeartDisease_infer.query(variables=['heartdisease'], evidence={'age': 28}))
+# Prepare data for the Naive Bayes model
+X = heartDisease.drop('heartdisease', axis=1)  # Features
+y = heartDisease['heartdisease']  # Target variable (heart disease)
+
+# Train Naive Bayes Model
+model = GaussianNB()
+model.fit(X, y)
+
+# Perform prediction for age = 28 (as given in your query)
+# We need to create a sample where age is 28 and other features are random
+sample_data = {'age': [28], 'sex': [0], 'trestbps': [120], 'restecg': [0], 'thalach': [140]}
+sample_df = pd.DataFrame(sample_data)
+
+# Predict probabilities
+pred_prob = model.predict_proba(sample_df)
+
+# Display the results
+for i, prob in enumerate(pred_prob[0]):
+    print(f"heartdisease_{i} : {prob:.4f}")
