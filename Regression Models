@@ -31,6 +31,15 @@ y_pred_dt = dt.predict(X_test)
 mse_dt = mean_squared_error(y_test, y_pred_dt)
 r2_dt = r2_score(y_test, y_pred_dt)
 
-# Print Decision Tree results
-print(f"Mean squared Error : {mse_dt:.2f}")
-print(f"R square score : {r2_dt:.2f}")
+# Random Forest Regressor Model
+rf = RandomForestRegressor(random_state=42)
+rf.fit(X_train, y_train)
+y_pred_rf = rf.predict(X_test)
+
+# Calculate Mean Squared Error and R-Squared for Random Forest
+mse_rf = mean_squared_error(y_test, y_pred_rf)
+r2_rf = r2_score(y_test, y_pred_rf)
+
+# Print Decision Tree and Random Forest results
+print(f"Decision Tree accuracy : {r2_dt:.2f}")
+print(f"Random Forest accuracy : {r2_rf:.2f}")
